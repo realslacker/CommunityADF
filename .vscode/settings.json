@@ -1,0 +1,11 @@
+{
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    "powershell.debugging.createTemporaryIntegratedConsole": true,
+    "powershell.enableProfileLoading": false
+}
