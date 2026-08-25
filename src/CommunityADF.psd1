@@ -101,7 +101,7 @@ PrivateData = @{
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://www.github.com/realslacker/CommunityADF'
+        ProjectUri = 'https://github.com/realslacker/CommunityADF'
 
         # A URL to an icon representing this module.
         # IconUri = ''
