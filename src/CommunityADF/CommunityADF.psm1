@@ -1,5 +1,11 @@
 #Requires -Version 5.1
 
+enum ADFStringFormat {
+    Text
+    Markdown
+    HTML
+}
+
 # MARK: ## BASE CLASSES ##
 
 
@@ -141,6 +147,10 @@ class ADFMark {
         return $Mark.GetType().Name -replace '^ADF' -replace 'Mark$' | ForEach-Object { $_.Substring( 0, 1 ).ToLower() + $_.Substring( 1 ) }
     }
 
+    [string] ApplyMarkdown( [string] $Text ) {
+        return $Text
+    }
+
 }
 
 
@@ -220,6 +230,14 @@ class ADFNode {
         # if validation passes, add the child node to the parent node's list of child nodes
         $this.content.Add( $ChildNode )
 
+    }
+
+    [string] ToMarkdown() {
+        if ( $this.Text ) {
+            return $this.Text
+        } else {
+            return ''
+        }
     }
 
 }
@@ -644,6 +662,14 @@ class ADFLinkMark : ADFMark {
         $this.AddAttribute( 'id', $Id )
         $this.AddAttribute( 'collection', $Collection )
         $this.AddAttribute( 'occurrenceKey', $OccurrenceKey )
+    }
+
+    [string] ApplyMarkdown( [string] $Text ) {
+        if ( $this.attrs['title'] ) {
+            return '[{0}]({1} "{2}")' -f $Text, $this.attrs['href'], $this.attrs['title']
+        } else {
+            return '[{0}]({1})' -f $Text, $this.attrs['href']
+        }
     }
 
 }
@@ -2464,17 +2490,12 @@ function New-ADFEmoji {
 class ADFHardBreak : ADFNode {
 
     [string] $type = 'hardBreak'
-    [hashtable] $attrs = @{}
 
-    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
-        [ADFAttributeInfo]::new( 'text', [string] )    # optional, text to display for the hard break, defaults to a newline character
-    )
+    # NOTE: Technically the hardBreak supports a text attribute, but it only allows the default value '\n'
+    # NOTE: so it is not implemented here, as it is not useful for any practical purpose.
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @()
 
     ADFHardBreak() : base() {}
-
-    ADFHardBreak( [string] $Text ) : base() {
-        $this.AddAttribute( 'text', $Text )
-    }
 
 }
 
@@ -2490,11 +2511,9 @@ function New-ADFHardBreak {
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFHardBreak] )]
     [Alias( 'ADFHardBreak' )]
-    param(
-        [string] $Text
-    )
-    
-    return if ( $PSBoundParameters.ContainsKey('Text') ) { [ADFHardBreak]::new( $Text ) } else { [ADFHardBreak]::new() }
+    param()
+
+    return [ADFHardBreak]::new()
 
 }
 
