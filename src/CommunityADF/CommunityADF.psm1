@@ -243,6 +243,20 @@ class ADFNode {
 }
 
 
+# MARK: ADFInlineNode Class
+# Base class for ADF inline nodes, which represent inline elements of the ADF structure and are annotated with ADFMarks.
+class ADFInlineNode : ADFNode {
+    ADFInlineNode() : base() {}
+}
+
+
+# MARK: ADFBlockNode Class
+# Base class for ADF block nodes, which represent block-level elements of the ADF structure and are annotated with ADFMarks.
+class ADFBlockNode : ADFNode {
+    ADFBlockNode() : base() {}
+}
+
+
 # MARK: ## MARKS ##
 
 
@@ -989,7 +1003,7 @@ function New-ADFDoc {
 
 # MARK: ADFBlockquote Class
 # Represents a blockquote element in the ADF structure.
-class ADFBlockquote : ADFNode {
+class ADFBlockquote : ADFBlockNode {
 
     [string] $type = 'blockquote'
     [System.Collections.Generic.List[ADFNode]] $content = @()
@@ -1030,7 +1044,7 @@ function New-ADFBlockquote {
 
 # MARK: ADFBulletList Class
 # Represents a bullet list element in the ADF structure.
-class ADFBulletList : ADFNode {
+class ADFBulletList : ADFBlockNode {
 
     [string] $type = 'bulletList'
     [System.Collections.Generic.List[ADFNode]] $content = @()
@@ -1377,7 +1391,7 @@ enum ADFCodeBlockLanguage {
 
 # MARK: ADFCodeBlock Class
 # Represents a code block element in the ADF structure.
-class ADFCodeBlock : ADFNode {
+class ADFCodeBlock : ADFBlockNode {
 
     [string] $type = 'codeBlock'
     [hashtable] $attrs = @{}
@@ -1428,7 +1442,7 @@ function New-ADFCodeBlock {
 
 # ADFExpand Class
 # Represents an expand element in the ADF structure.
-class ADFExpand : ADFNode {
+class ADFExpand : ADFBlockNode {
 
     [string] $type = 'expand'
     [hashtable] $attrs = @{}
@@ -1499,7 +1513,7 @@ enum ADFHeadingLevel {
 
 # MARK: ADFHeading Class
 # Represents a heading element in the ADF structure.
-class ADFHeading : ADFNode {
+class ADFHeading : ADFBlockNode {
 
     [string] $type = 'heading'
     [hashtable] $attrs = @{}
@@ -1566,7 +1580,7 @@ function New-ADFHeading {
 
 # MARK: ADFMediaGroup Class
 # Represents a media group element in the ADF structure.
-class ADFMediaGroup : ADFNode {
+class ADFMediaGroup : ADFBlockNode {
 
     [string] $type = 'mediaGroup'
     [System.Collections.Generic.List[ADFNode]] $content = @()
@@ -1629,7 +1643,7 @@ enum ADFMediaSingleWidthType {
 
 # MARK: ADFMediaSingle Class
 # Represents a media single element in the ADF structure.
-class ADFMediaSingle : ADFNode {
+class ADFMediaSingle : ADFBlockNode {
 
     [string] $type = 'mediaSingle'
     [hashtable] $attrs = @{}
@@ -1689,7 +1703,7 @@ function New-ADFMediaSingle {
 
 # MARK: ADFOrdereList Class
 # Represents an ordered list element in the ADF structure.
-class ADFOrderedList : ADFNode {
+class ADFOrderedList : ADFBlockNode {
 
     [string] $type = 'orderedList'
     [hashtable] $attrs = @{}
@@ -1752,7 +1766,7 @@ enum ADFPanelType {
 
 # MARK: ADFPanel Class
 # Represents a panel element in the ADF structure.
-class ADFPanel : ADFNode {
+class ADFPanel : ADFBlockNode {
 
     [string] $type = 'panel'
     [hashtable] $attrs = @{}
@@ -1804,7 +1818,7 @@ function New-ADFPanel {
 
 # MARK: ADFParagraph Class
 # Represents a paragraph element in the ADF structure.
-class ADFParagraph : ADFNode {
+class ADFParagraph : ADFBlockNode {
 
     [string] $type = 'paragraph'
     [System.Collections.Generic.List[ADFNode]] $content = @()
@@ -1860,7 +1874,7 @@ function New-ADFParagraph {
 
 # MARK: ADFRule Class
 # Represents a rule element in the ADF structure.
-class ADFRule : ADFNode {
+class ADFRule : ADFBlockNode {
 
     [string] $type = 'rule'
 
@@ -1907,7 +1921,7 @@ enum ADFTableDisplayMode {
 
 # MARK: ADFTable Class
 # Represents a table element in the ADF structure.
-class ADFTable : ADFNode {
+class ADFTable : ADFBlockNode {
 
     [string] $type = 'table'
     [hashtable] $attrs = @{}
@@ -1993,7 +2007,7 @@ function New-ADFTable {
 
 # MARK: ADFListItem Class
 # Represents a list item element in the ADF structure, which can be a child of bullet list or ordered list elements.
-class ADFListItem : ADFNode {
+class ADFListItem : ADFBlockNode {
 
     [string] $type = 'listItem'
     [System.Collections.Generic.List[ADFNode]] $content = @()
@@ -2042,7 +2056,7 @@ enum ADFMediaType {
 
 # MARK: ADFMedia Class
 # Represents a media element in the ADF structure, which can be a child of media group or media single elements.
-class ADFMedia : ADFNode {
+class ADFMedia : ADFBlockNode {
 
     [string] $type = 'media'
     [hashtable] $attrs = @{}
@@ -2209,7 +2223,7 @@ function New-ADFNestedExpand {
 
 # MARK ADFTableCell Class
 # Represents a table cell element in the ADF structure, which can be a child of a table row element.
-class ADFTableCell : ADFNode {
+class ADFTableCell : ADFBlockNode {
 
     [string] $type = 'tableCell'
     [hashtable] $attrs = @{}
@@ -2337,7 +2351,7 @@ function New-ADFTableHeader {
 
 # MARK: ADFTableRow Class
 # Represents a table row element in the ADF structure, which can be a child of a table element and can contain table cell and table header elements.
-class ADFTableRow : ADFNode {
+class ADFTableRow : ADFBlockNode {
 
     [string] $type = 'tableRow'
     [System.Collections.Generic.List[ADFNode]] $content = @()
@@ -2381,7 +2395,7 @@ function New-ADFTableRow {
 
 # MARK: ADFDate Class
 # Represents a date element in the ADF structure, which can be a child of paragraph or heading elements.
-class ADFDate : ADFNode {
+class ADFDate : ADFInlineNode {
 
     [string] $type = 'date'
     [hashtable] $attrs = @{}
@@ -2421,7 +2435,7 @@ function New-ADFDate {
 
 # MARK: ADFEmoji Class
 # Represents an emoji element in the ADF structure, which can be a child of paragraph or heading elements.
-class ADFEmoji : ADFNode {
+class ADFEmoji : ADFInlineNode {
 
     [string] $type = 'emoji'
     [hashtable] $attrs = @{}
@@ -2487,7 +2501,7 @@ function New-ADFEmoji {
 
 # MARK: ADFHardBreak Class
 # Represents a hard break element in the ADF structure, which can be a child of paragraph or heading elements.
-class ADFHardBreak : ADFNode {
+class ADFHardBreak : ADFInlineNode {
 
     [string] $type = 'hardBreak'
 
@@ -2520,7 +2534,7 @@ function New-ADFHardBreak {
 
 # MARK: ADFInlineCard Class
 # Represents an inline card element in the ADF structure, which can be a child of paragraph or heading elements.
-class ADFInlineCard : ADFNode {
+class ADFInlineCard : ADFInlineNode {
 
     [string] $type = 'inlineCard'
     [hashtable] $attrs = @{}
@@ -2588,7 +2602,7 @@ enum ADFMentionUserType {
 
 # MARK: ADFMention Class
 # Represents a mention element in the ADF structure, which can be a child of paragraph or heading elements.
-class ADFMention : ADFNode {
+class ADFMention : ADFInlineNode {
 
     [string] $type = 'mention'
     [hashtable] $attrs = @{}
@@ -2667,7 +2681,7 @@ enum ADFStatusColor {
 
 # MARK: ADFStatus Class
 # Represents a status element in the ADF structure, which can be a child of paragraph or heading elements.
-class ADFStatus : ADFNode {
+class ADFStatus : ADFInlineNode {
 
     [string] $type = 'status'
     [hashtable] $attrs = @{}
@@ -2716,7 +2730,7 @@ function New-ADFStatus {
 
 # MARK: ADFText Class
 # Represents a text element in the ADF structure, which can be a child of paragraph or heading elements.
-class ADFText : ADFNode {
+class ADFText : ADFInlineNode {
 
     [string] $type = 'text'
     [string] $text = ''
@@ -2785,5 +2799,159 @@ function New-ADFText {
     }
     
     return $Node
+
+}
+
+
+
+# MARK: Get-ADFDocumentNode Function
+function Get-ADFDocumentNode {
+    <#
+    .SYNOPSIS
+        Retrieves nodes from an ADF document structure.
+    .DESCRIPTION
+        This function extracts nodes from an ADF structure and returns them. It crawls the document tree and
+        collects all nodes of the given type. It can optionally return the text elements of the nodes
+        instead of the full node objects.
+    .PARAMETER RootNode
+        The root node of the ADF document from which to start the search. This should be an object of type ADFNode.
+    .PARAMETER NodeType
+        The type of nodes to retrieve from the ADF document. This should be a string representing the node type.
+    .PARAMETER MaxDepth
+        An optional parameter that specifies the maximum depth to which the function should search for nodes. If not
+        specified, the function will search through the entire document tree.
+    .PARAMETER ExtractText
+        A switch parameter that, when specified, indicates that only the text content of the nodes should be
+        returned, rather than the full node objects.
+    #>
+    [CmdletBinding( PositionalBinding = $false )]
+    param(
+        [Parameter( Mandatory, ValueFromPipeline )]
+        [ADFNode] $RootNode,
+        [ValidateSet( 'doc', 'paragraph', 'heading', 'mediaGroup', 'mediaSingle', 'table', 'tableRow', 'tableCell', 'tableHeader', 'expand', 'nestedExpand', 'inlineCard', 'mention', 'status', 'text' )]
+        [string] $NodeType = 'doc',
+        [UInt32] $MaxDepth,
+        [switch] $ExtractText
+    )
+
+    process {
+
+        # initialize the queue for breadth-first traversal
+        $queue = [System.Collections.Generic.Queue[pscustomobject]]@()
+
+        # enqueue the root node with depth 0
+        $queue.Enqueue([pscustomobject]@{ Node = $RootNode; Depth = 0; InMatch = $false })
+
+        while ($queue.Count -gt 0) {
+
+            $current = $queue.Dequeue()
+            $node    = $current.Node
+            $depth   = $current.Depth
+            $inMatch = $current.InMatch
+
+            $isMatch = $node.type -eq $NodeType
+            $inMatch = $inMatch -or $isMatch
+
+            if ( -not $ExtractText ) {
+
+                # default behavior: return the node object if it matches the type
+                if ( $isMatch ) {
+                    Write-Output $node
+                }
+
+            } else {
+
+                # if ExtractText is specified, return the text content of the node if it matches the type
+                if ( $inMatch -and $node -is [ADFInlineNode] ) {
+
+                    # date nodes
+                    if ( $node -is [ADFDate] ) {
+                        Write-Output [System.DateTimeOffset]::FromUnixTimeSeconds($node.attrs.timestamp).LocalDateTime.ToString('yyyy-MM-dd')
+                    }
+
+                    # emoji nodes
+                    if ( $node -is [ADFEmoji] ) {
+                        Write-Output $node.attrs.text
+                    }
+
+                    # hardBreak nodes
+                    if ( $node -is [ADFHardBreak] ) {
+                        Write-Output "`n"
+                    }
+
+                    # inlineCard nodes
+                    if ( $node -is [ADFInlineCard] ) {
+                        Write-Output $node.attrs.url
+                    }
+
+                    # mention nodes
+                    if ( $node -is [ADFMention] ) {
+                        if ( $node.attrs.text ) {
+                            Write-Output $node.attrs.text
+                        } else {
+                            Write-Output $node.attrs.id
+                        }
+                    }
+
+                    # status nodes
+                    if ( $node -is [ADFStatus] ) {
+                        Write-Output $node.attrs.text
+                    }
+
+                    # text nodes
+                    if ( $node -is [ADFText] ) {
+                        $nodeText = $node.text
+                        # process formatting marks in the order they are applied, wrapping the text with the appropriate markdown syntax
+                        foreach ( $mark in $node.marks ) {
+                            switch ( $mark.type ) {
+                                'code'           { $nodeText = '`{0}`' -f $nodeText }
+                                'em'             { $nodeText = '_{0}_' -f $nodeText }
+                                'strike'         { $nodeText = '~~{0}~~' -f $nodeText }
+                                'strong'         { $nodeText = '**{0}**' -f $nodeText }
+                                'subsup'         {
+                                    if ( $mark.attrs.type -eq 'sub' ) {
+                                        $nodeText = '~{0}~' -f $nodeText
+                                    } else {
+                                        $nodeText = '^{0}^' -f $nodeText
+                                    }
+                                }
+                                'underline'      { $nodeText = '_{0}_' -f $nodeText }
+                            }
+                        }
+                        # apply link mark last, so that it wraps around any other formatting
+                        if ( $mark = $node.marks | Where-Object { $_.type -eq 'link' } ) {
+                            if ( $mark.attrs.title ) {
+                                $nodeText = "[{0}]({1} '{2}')" -f $nodeText, $mark.attrs.href, $mark.attrs.title
+                            } else {
+                                $nodeText = "[{0}]({1})" -f $nodeText, $mark.attrs.href
+                            }
+                        }
+                        Write-Output $nodeText
+                    }
+
+                    # mediaInline nodes
+                    if ( $node -is [ADFMedia] ) {
+                        $format = '![{0}]({1})'
+                        if ( $node.attrs.type -eq 'file' ) {
+                            Write-Output ( $format -f $node.attrs.type, $node.attrs.id )
+                        } elseif ( $node.attrs.type -eq 'link' ) {
+                            Write-Output ( $format -f $node.attrs.type, $node.marks.attrs.url )
+                        }
+                    }
+
+                }
+
+            }
+
+            # enqueue child nodes if the current depth is less than MaxDepth (if specified)
+            if ( ( -not $MaxDepth -or $depth -lt $MaxDepth ) -and $node.content ) {
+                foreach ( $child in $node.content ) {
+                    $queue.Enqueue([pscustomobject]@{ Node = $child; Depth = $depth + 1; InMatch = $inMatch })
+                }
+            }
+
+        }
+
+    }
 
 }
