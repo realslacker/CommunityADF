@@ -86,7 +86,7 @@ FunctionsToExport = 'Add-ADFAlignmentMark', 'Add-ADFAnnotationMark',
                'New-ADFNestedExpand', 'New-ADFOrderedList', 'New-ADFPanel', 
                'New-ADFParagraph', 'New-ADFRule', 'New-ADFStatus', 'New-ADFTable', 
                'New-ADFTableCell', 'New-ADFTableHeader', 'New-ADFTableRow', 
-               'New-ADFText'
+               'New-ADFText', 'Get-ADFDocumentNode'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
