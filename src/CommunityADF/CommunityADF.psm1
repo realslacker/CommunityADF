@@ -2688,7 +2688,7 @@ class ADFStatus : ADFInlineNode {
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
         [ADFAttributeInfo]::new( 'text', [string] )                                                               # required, text to display for the status
-        [ADFAttributeInfo]::new( 'color', [ADFStatusColor], [string], { $_.ToString() } )                         # required, color of the status, defaults to Neutral
+        [ADFAttributeInfo]::new( 'color', [ADFStatusColor], [string], { $_.ToString().ToLower() } )               # required, color of the status, defaults to Neutral
     )
 
     ADFStatus( [string] $Text ) : base() {
