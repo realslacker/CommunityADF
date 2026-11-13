@@ -86,7 +86,7 @@ FunctionsToExport = 'Add-ADFAlignmentMark', 'Add-ADFAnnotationMark',
                'New-ADFNestedExpand', 'New-ADFOrderedList', 'New-ADFPanel', 
                'New-ADFParagraph', 'New-ADFRule', 'New-ADFStatus', 'New-ADFTable', 
                'New-ADFTableCell', 'New-ADFTableHeader', 'New-ADFTableRow', 
-               'New-ADFText', 'Get-ADFDocumentNode'
+               'New-ADFTaskItem', 'New-ADFTaskList', 'New-ADFText', 'Get-ADFDocumentNode'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -103,7 +103,7 @@ AliasesToExport = 'Add-ADFBoldMark', 'Add-ADFItalicMark', 'ADFAlignment', 'ADFAn
                'ADFMediaGroup', 'ADFMediaSingle', 'ADFMention', 'ADFNestedExpand', 
                'ADFOrderedList', 'ADFPanel', 'ADFParagraph', 'ADFRule', 'ADFStatus', 
                'ADFStrike', 'ADFStrong', 'ADFSubSup', 'ADFTable', 'ADFTableCell', 
-               'ADFTableHeader', 'ADFTableRow', 'ADFText', 'ADFTextColor', 
+               'ADFTableHeader', 'ADFTableRow', 'ADFTaskItem', 'ADFTaskList', 'ADFText', 'ADFTextColor', 
                'ADFUnderline', 'Get-ADFBoldMark', 'Get-ADFItalicMark'
 
 # DSC resources to export from this module

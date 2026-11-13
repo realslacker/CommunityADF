@@ -1,4 +1,4 @@
-Import-Module "$PSScriptRoot\..\src\CommunityADF.psd1" -Force
+Import-Module "$PSScriptRoot\..\src\CommunityADF\CommunityADF.psd1" -Force
 
 Write-Host 'Basic Code Block Example' -ForegroundColor Cyan
 

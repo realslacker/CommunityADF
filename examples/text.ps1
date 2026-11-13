@@ -1,4 +1,4 @@
-Import-Module "$PSScriptRoot\..\src\CommunityADF.psd1" -Force
+Import-Module "$PSScriptRoot\..\src\CommunityADF\CommunityADF.psd1" -Force
 
 Write-Host 'Text Mark Examples' -ForegroundColor Cyan
 
@@ -20,8 +20,8 @@ ADFDoc {
 Write-Host 'Code, color, and combined formatting' -ForegroundColor DarkCyan
 ADFDoc {
     ADFParagraph {
-        ADFText -Text 'Run: ' 
-        ADFText -Text 'Get-Process' -Code -TextColor '#0078D4'
+        ADFText -Text 'Run: ' -Strong -TextColor '#0078D4'
+        ADFText -Text 'Get-Process' -Code
         ADFText -Text ' to inspect running services.'
     }
 } | ConvertTo-Json -Depth 100

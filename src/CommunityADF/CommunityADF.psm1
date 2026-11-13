@@ -336,7 +336,7 @@ class ADFAnnotationMark : ADFMark {
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
         [ADFAttributeInfo]::new( 'id', [string], $true ) # required, unique identifier for the annotation
-        [ADFAttributeInfo]::new( 'annotationType', [ADFAnnotationType], [string], { $_.ToString()[0].ToLower() + $_.ToString().Substring(1) }, $true ) # required, type of annotation (e.g., inlineComment)
+        [ADFAttributeInfo]::new( 'annotationType', [ADFAnnotationType], [string], { $_.ToString().Substring(0, 1).ToLower() + $_.ToString().Substring(1) }, $true ) # required, type of annotation (e.g., inlineComment)
     )
 
     ADFAnnotationMark( [string] $Id, [ADFAnnotationType] $AnnotationType ) : base() {
@@ -670,6 +670,10 @@ class ADFLinkMark : ADFMark {
         [ADFAttributeInfo]::new( 'occurrenceKey', [string] )      # optional, unique key for tracking occurrences of the link, useful for analytics or link management purposes
     )
 
+    ADFLinkMark( [uri] $Href ) : base() {
+        $this.AddAttribute( 'href', $Href )
+    }
+
     ADFLinkMark( [uri] $Href, [string] $Title, [string] $Id, [string] $Collection, [string] $OccurrenceKey ) : base() {
         $this.AddAttribute( 'href', $Href )
         $this.AddAttribute( 'title', $Title )
@@ -960,7 +964,7 @@ class ADFDoc : ADFNode {
     hidden static [string[]] $AllowedChildren = @(
         'blockquote', 'bulletList', 'codeBlock', 'expand', 'heading',
         'mediaGroup', 'mediaSingle', 'orderedList', 'panel', 'paragraph',
-        'rule', 'table'
+        'rule', 'table', 'taskList'
     )
 
     ADFDoc( [int] $Version ) : base() {
@@ -1475,12 +1479,12 @@ class ADFExpand : ADFBlockNode {
     hidden static [string[]] $AllowedChildren = @(
         'bulletList', 'blockquote', 'codeBlock', 'heading', 'mediaGroup', 'mediaSingle',
         'orderedList', 'panel', 'paragraph', 'rule', 'table', 'multiBodiedExtension',
-        'extensionFrame', 'nestedExpand'
+        'extensionFrame', 'nestedExpand', 'taskList'
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
         [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
-        [ADFAttributeInfo]::new( 'title', [string], $true )
+        [ADFAttributeInfo]::new( 'title', [string] )    # optional
     )
 
     hidden static [string[]] $AllowedMarks = @(
@@ -1816,7 +1820,7 @@ class ADFPanel : ADFBlockNode {
     [System.Collections.Generic.List[ADFNode]] $content = @()
 
     hidden static [string[]] $AllowedChildren = @(
-        'bulletList', 'heading', 'orderedList', 'paragraph'
+        'bulletList', 'heading', 'orderedList', 'paragraph', 'taskList'
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
@@ -2096,11 +2100,12 @@ class ADFTaskItem : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
-        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
+        [ADFAttributeInfo]::new( 'localId', [string], $true )  # required, unique identifier (generated if not provided)
         [ADFAttributeInfo]::new( 'state', [ADFTaskItemState], [string], { $_.ToString().ToUpper() } )  # required
     )
     
     ADFTaskItem( [ADFTaskItemState] $State ) : base() {
+        $this.AddAttribute( 'localId', [guid]::NewGuid().ToString() )
         $this.AddAttribute( 'state', $State )
     }
 
@@ -2117,7 +2122,7 @@ function New-ADFTaskItem {
     .PARAMETER State
         The state of the task item, indicating whether it is completed (DONE) or pending (TODO).
     .PARAMETER LocalId
-        Optional unique identifier for the node.
+        Unique identifier for the node. The ADF schema requires one, so a GUID is generated if not provided.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFTaskItem] )]
@@ -2149,14 +2154,16 @@ class ADFTaskList : ADFBlockNode {
     [System.Collections.Generic.List[ADFNode]] $content = @()
 
     hidden static [string[]] $AllowedChildren = @(
-        'taskItem'
+        'taskItem', 'taskList'
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
-        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
+        [ADFAttributeInfo]::new( 'localId', [string], $true )  # required, unique identifier (generated if not provided)
     )
 
-    ADFTaskList() : base() {}
+    ADFTaskList() : base() {
+        $this.AddAttribute( 'localId', [guid]::NewGuid().ToString() )
+    }
 
 }
 
@@ -2169,7 +2176,7 @@ function New-ADFTaskList {
     .PARAMETER Content
         Scriptblock whose output ADFNode objects will be added as children of the task list node. Typically, these will be ADFTaskItem nodes representing individual tasks within the list.
     .PARAMETER LocalId
-        Optional unique identifier for the node.
+        Unique identifier for the node. The ADF schema requires one, so a GUID is generated if not provided.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFTaskList] )]
@@ -2201,7 +2208,7 @@ class ADFListItem : ADFBlockNode {
     [System.Collections.Generic.List[ADFNode]] $content = @()
 
     hidden static [string[]] $AllowedChildren = @(
-        'bulletList', 'codeBlock', 'mediaSingle', 'orderedList', 'paragraph'
+        'bulletList', 'codeBlock', 'mediaSingle', 'orderedList', 'paragraph', 'taskList'
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
@@ -2378,7 +2385,7 @@ class ADFNestedExpand : ADFBlockNode {
     [System.Collections.Generic.List[ADFNode]] $content = @()
 
     hidden static [string[]] $AllowedChildren = @(
-        'paragraph', 'heading', 'mediaGroup', 'mediaSingle'
+        'paragraph', 'heading', 'mediaGroup', 'mediaSingle', 'taskList'
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
@@ -2437,7 +2444,7 @@ class ADFTableCell : ADFBlockNode {
 
     hidden static [string[]] $AllowedChildren = @(
         'blockquote', 'bulletList', 'codeBlock', 'heading', 'mediaGroup', 'nestedExpand',
-        'orderedList', 'panel', 'paragraph', 'rule'
+        'orderedList', 'panel', 'paragraph', 'rule', 'taskList'
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
@@ -2608,12 +2615,15 @@ class ADFDate : ADFInlineNode {
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
         [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
-        [ADFAttributeInfo]::new( 'timestamp', [DateTime], [Int64], { [System.DateTimeOffset]::new( $_ ).ToUnixTimeSeconds() } )
+        # ADF stores a date as milliseconds since the Unix epoch (as a string) at midnight UTC, and Atlassian
+        # editors render it in UTC. Use only the calendar date, as seen in the value's own offset, so the
+        # displayed day matches the input regardless of the local time zone.
+        [ADFAttributeInfo]::new( 'timestamp', [DateTimeOffset], [string], { [string] [System.DateTimeOffset]::new( $_.Date.Ticks, [TimeSpan]::Zero ).ToUnixTimeMilliseconds() } )
     )
 
     ADFDate() : base() {}
 
-    ADFDate( [DateTime] $Timestamp ) : base() {
+    ADFDate( [DateTimeOffset] $Timestamp ) : base() {
         $this.AddAttribute( 'timestamp', $Timestamp )
     }
 
@@ -2626,15 +2636,24 @@ function New-ADFDate {
     .SYNOPSIS
         Creates an ADF date node.
     .PARAMETER Timestamp
-        The date and time value to be represented by the date node.
+        The date to be represented by the date node. Only the calendar date is used; the time of day is ignored.
+        Accepts a DateTimeOffset, a DateTime, or a string. The calendar date is taken in the value's own offset, so
+        '2024-01-15T00:00:00Z' and '2024-01-15T00:00:00+10:00' both produce 2024-01-15 regardless of the local
+        time zone. Note that casting with [datetime] first (e.g. [datetime]'2024-01-15T00:00:00Z') converts the
+        value to local time before it reaches this command, which can change the date.
     .PARAMETER LocalId
         Optional unique identifier for the node.
+    .EXAMPLE
+        New-ADFDate -Timestamp '2024-01-15'
+    .EXAMPLE
+        New-ADFDate -Timestamp (Get-Date)
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFDate] )]
     [Alias( 'ADFDate' )]
     param(
-        [DateTime] $Timestamp,
+        [Parameter( Mandatory )]
+        [DateTimeOffset] $Timestamp,
         [string] $LocalId
     )
     
@@ -2984,8 +3003,26 @@ class ADFText : ADFInlineNode {
         'strong', 'subsup', 'textColor', 'underline'
     )
 
+    # Marks that may be combined with the code mark; any other mark makes the text node invalid.
+    hidden static [string[]] $CodeCompatibleMarks = @( 'annotation', 'code', 'link' )
+
     ADFText( [object] $Object ) : base() {
         $this.Text = $Object
+    }
+
+    [void] AddMark( [ADFMark] $Mark ) {
+        $ExistingTypes = @( $this.marks | ForEach-Object type )
+        $Conflict = if ( $Mark.type -eq 'code' ) {
+            $ExistingTypes | Where-Object { $_ -notin [ADFText]::CodeCompatibleMarks } | Select-Object -First 1
+        }
+        elseif ( $ExistingTypes -contains 'code' -and $Mark.type -notin [ADFText]::CodeCompatibleMarks ) {
+            'code'
+        }
+        if ( $Conflict ) {
+            $ExceptionMessage = 'Text marks "code" and "{0}" cannot be combined. The code mark may only be combined with: {1}.' -f ( @( $Mark.type, $Conflict ) -ne 'code' )[0], ( [ADFText]::CodeCompatibleMarks -ne 'code' -join ', ' )
+            throw [System.ArgumentException]::new( $ExceptionMessage, 'Mark' )
+        }
+        ([ADFNode] $this).AddMark( $Mark )
     }
 
 }
@@ -3029,7 +3066,7 @@ function New-ADFText {
     if ( $Em ) { $Node.AddMark( [ADFEmMark]::new() ) }
     if ( $Strike ) { $Node.AddMark( [ADFStrikeMark]::new() ) }
     if ( $Strong ) { $Node.AddMark( [ADFStrongMark]::new() ) }
-    if ( $SubsupType ) { $Node.AddMark( [ADFSubSupMark]::new( $SubsupType ) ) }
+    if ( $PSBoundParameters.ContainsKey('SubsupType') ) { $Node.AddMark( [ADFSubSupMark]::new( $SubsupType ) ) }
     if ( $TextColor ) { $Node.AddMark( [ADFTextColorMark]::new( $TextColor ) ) }
     if ( $Underline ) { $Node.AddMark( [ADFUnderlineMark]::new() ) }
     if ( $PSBoundParameters.ContainsKey('LinkHref') ) {
@@ -3079,15 +3116,15 @@ function Get-ADFDocumentNode {
 
     process {
 
-        # initialize the queue for breadth-first traversal
-        $queue = [System.Collections.Generic.Queue[pscustomobject]]@()
+        # initialize the stack for depth-first (document order) traversal
+        $stack = [System.Collections.Generic.Stack[pscustomobject]]@()
 
-        # enqueue the root node with depth 0
-        $queue.Enqueue([pscustomobject]@{ Node = $RootNode; Depth = 0; InMatch = $false })
+        # push the root node with depth 0
+        $stack.Push([pscustomobject]@{ Node = $RootNode; Depth = 0; InMatch = $false })
 
-        while ($queue.Count -gt 0) {
+        while ($stack.Count -gt 0) {
 
-            $current = $queue.Dequeue()
+            $current = $stack.Pop()
             $node    = $current.Node
             $depth   = $current.Depth
             $inMatch = $current.InMatch
@@ -3105,16 +3142,20 @@ function Get-ADFDocumentNode {
             } else {
 
                 # if ExtractText is specified, return the text content of the node if it matches the type
-                if ( $inMatch -and $node -is [ADFInlineNode] ) {
+                if ( $inMatch -and ( $node -is [ADFInlineNode] -or $node -is [ADFMedia] ) ) {
 
                     # date nodes
                     if ( $node -is [ADFDate] ) {
-                        Write-Output [System.DateTimeOffset]::FromUnixTimeSeconds($node.attrs.timestamp).LocalDateTime.ToString('yyyy-MM-dd')
+                        Write-Output ( [System.DateTimeOffset]::FromUnixTimeMilliseconds( [Int64] $node.attrs.timestamp ).UtcDateTime.ToString( 'yyyy-MM-dd' ) )
                     }
 
-                    # emoji nodes
+                    # emoji nodes, falling back to the short name when no text is set
                     if ( $node -is [ADFEmoji] ) {
-                        Write-Output $node.attrs.text
+                        if ( $node.attrs.text ) {
+                            Write-Output $node.attrs.text
+                        } else {
+                            Write-Output $node.attrs.shortName
+                        }
                     }
 
                     # hardBreak nodes
@@ -3172,13 +3213,14 @@ function Get-ADFDocumentNode {
                         Write-Output $nodeText
                     }
 
-                    # mediaInline nodes
+                    # media nodes
                     if ( $node -is [ADFMedia] ) {
                         $format = '![{0}]({1})'
                         if ( $node.attrs.type -eq 'file' ) {
                             Write-Output ( $format -f $node.attrs.type, $node.attrs.id )
                         } elseif ( $node.attrs.type -eq 'link' ) {
-                            Write-Output ( $format -f $node.attrs.type, $node.marks.attrs.url )
+                            $linkMark = $node.marks | Where-Object { $_.type -eq 'link' } | Select-Object -First 1
+                            Write-Output ( $format -f $node.attrs.type, $linkMark.attrs.href )
                         }
                     }
 
@@ -3186,10 +3228,10 @@ function Get-ADFDocumentNode {
 
             }
 
-            # enqueue child nodes if the current depth is less than MaxDepth (if specified)
+            # push child nodes in reverse so they are popped in document order, if the current depth is less than MaxDepth (if specified)
             if ( ( -not $MaxDepth -or $depth -lt $MaxDepth ) -and $node.content ) {
-                foreach ( $child in $node.content ) {
-                    $queue.Enqueue([pscustomobject]@{ Node = $child; Depth = $depth + 1; InMatch = $inMatch })
+                for ( $i = $node.content.Count - 1; $i -ge 0; $i-- ) {
+                    $stack.Push([pscustomobject]@{ Node = $node.content[$i]; Depth = $depth + 1; InMatch = $inMatch })
                 }
             }
 

@@ -22,19 +22,19 @@ CommunityADF is a PowerShell DSL for building Atlassian Document Format (ADF) JS
 From the repository root:
 
 ```powershell
-Import-Module .\src\CommunityADF.psd1 -Force
+Import-Module .\src\CommunityADF\CommunityADF.psd1 -Force
 ```
 
 If you want to load the module from elsewhere, use the module path directly:
 
 ```powershell
-Import-Module "C:\path\to\CommunityADF\src\CommunityADF.psd1" -Force
+Import-Module "C:\path\to\CommunityADF\src\CommunityADF\CommunityADF.psd1" -Force
 ```
 
 ## Quick start
 
 ```powershell
-Import-Module .\src\CommunityADF.psd1 -Force
+Import-Module .\src\CommunityADF\CommunityADF.psd1 -Force
 
 ADFDoc {
     ADFParagraph {
@@ -88,8 +88,8 @@ Examples can be run directly with PowerShell:
 ```powershell
 ADFDoc {
     ADFParagraph {
-        ADFText -Text 'Run: ' 
-        ADFText -Text 'Get-Process' -Code -TextColor '#0078D4'
+        ADFText -Text 'Run: ' -Strong -TextColor '#0078D4'
+        ADFText -Text 'Get-Process' -Code
         ADFText -Text ' to inspect running services.'
     }
 } | ConvertTo-Json -Depth 100
