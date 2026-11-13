@@ -1006,10 +1006,15 @@ function New-ADFDoc {
 class ADFBlockquote : ADFBlockNode {
 
     [string] $type = 'blockquote'
+    [hashtable] $attrs = @{}
     [System.Collections.Generic.List[ADFNode]] $content = @()
 
     hidden static [string[]] $AllowedChildren = @(
         'paragraph', 'bulletList', 'orderedList', 'codeBlock', 'mediaGroup', 'mediaSingle'
+    )
+
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
     )
 
     ADFBlockquote() : base() {}
@@ -1024,16 +1029,20 @@ function New-ADFBlockquote {
         Creates an ADF blockquote node.
     .PARAMETER Content
         Scriptblock whose output ADFNode objects will be added as children of the blockquote node.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFBlockquote] )]
     [Alias( 'ADFBlockquote' )]
     param(
         [Parameter( Position = 0 )]
-        [scriptblock] $Content
+        [scriptblock] $Content,
+        [string] $LocalId
     )
     
     $Node = [ADFBlockquote]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -1047,10 +1056,15 @@ function New-ADFBlockquote {
 class ADFBulletList : ADFBlockNode {
 
     [string] $type = 'bulletList'
+    [hashtable] $attrs = @{}
     [System.Collections.Generic.List[ADFNode]] $content = @()
 
     hidden static [string[]] $AllowedChildren = @(
         'listItem'
+    )
+
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
     )
 
     ADFBulletList() : base() {}
@@ -1065,16 +1079,20 @@ function New-ADFBulletList {
         Creates an ADF bullet list node.
     .PARAMETER Content
         Scriptblock whose output ADFNode objects will be added as children of the bullet list node.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFBulletList] )]
     [Alias( 'ADFBulletList' )]
     param(
         [Parameter( Position = 0 )]
-        [scriptblock] $Content
+        [scriptblock] $Content,
+        [string] $LocalId
     )
     
     $Node = [ADFBulletList]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -1402,6 +1420,7 @@ class ADFCodeBlock : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'language', [ADFCodeBlockLanguage], [string] )
     )
 
@@ -1421,6 +1440,8 @@ function New-ADFCodeBlock {
         Scriptblock whose output ADFNode objects will be added as children of the code block node.
     .PARAMETER Language
         The programming language of the code block content, used for syntax highlighting.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFCodeBlock] )]
@@ -1428,10 +1449,12 @@ function New-ADFCodeBlock {
     param(
         [Parameter( Position = 0 )]
         [scriptblock] $Content,
-        [ADFCodeBlockLanguage] $Language = [ADFCodeBlockLanguage]::none
+        [ADFCodeBlockLanguage] $Language = [ADFCodeBlockLanguage]::none,
+        [string] $LocalId
     )
     
     $Node = [ADFCodeBlock]::new( $Language )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -1456,6 +1479,7 @@ class ADFExpand : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'title', [string], $true )
     )
 
@@ -1480,6 +1504,8 @@ function New-ADFExpand {
         Scriptblock whose output ADFNode objects will be added as children of the expand node.
     .PARAMETER Title
         The title of the expand node, displayed as the clickable text that expands or collapses the content.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false, DefaultParameterSetName = 'Default' )]
     [OutputType( [ADFExpand] )]
@@ -1487,10 +1513,12 @@ function New-ADFExpand {
     param(
         [Parameter( Position = 0 )]
         [scriptblock] $Content,
-        [string] $Title
+        [string] $Title,
+        [string] $LocalId
     )
     
     $Node = [ADFExpand]::new( $Title )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -1525,6 +1553,7 @@ class ADFHeading : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'level', [ADFHeadingLevel], [int] )
     )
 
@@ -1549,6 +1578,8 @@ function New-ADFHeading {
         Scriptblock whose output ADFNode objects will be added as children of the heading node.
     .PARAMETER Level
         The level of the heading, typically an integer from 1 to 6, where 1 represents the highest level (largest text) and 6 represents the lowest level (smallest text).
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFHeading] )]
@@ -1560,10 +1591,12 @@ function New-ADFHeading {
         [ADFHeadingLevel] $Level,
         [ADFAlignment] $Align,
         [ValidateRange( 1, 6 )]
-        [int] $IndentationLevel
+        [int] $IndentationLevel,
+        [string] $LocalId
     )
     
     $Node = [ADFHeading]::new( $Level )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Align ) {
         $Node | Add-ADFAlignmentMark -Align $Align
     }
@@ -1654,6 +1687,7 @@ class ADFMediaSingle : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'layout', [ADFMediaSingleLayout], [string], { ( $_.ToString() -creplace '(?<=[a-z])(?=[A-Z])', '-' ).ToLower() } ) # required
         [ADFAttributeInfo]::new( 'width', [double] )
         [ADFAttributeInfo]::new( 'widthType', [ADFMediaSingleWidthType], [string], { $_.ToString().ToLower() } )
@@ -1677,6 +1711,8 @@ function New-ADFMediaSingle {
         Scriptblock whose output ADFNode objects will be added as children of the media single node. Typically, this will be a single ADFMedia node representing the media item.
     .PARAMETER Layout
         The layout of the media single, which determines how the media item is displayed within the document. Common layout options include 'center', 'wrap-left', 'wrap-right', and 'wide'.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false, DefaultParameterSetName = 'Default' )]
     [OutputType( [ADFMediaSingle] )]
@@ -1689,10 +1725,12 @@ function New-ADFMediaSingle {
         [Parameter( ParameterSetName = 'WithWidth', Mandatory )]
         [double] $Width = 0,
         [Parameter( ParameterSetName = 'WithWidth', Mandatory )]
-        [ADFMediaSingleWidthType] $WidthType = [ADFMediaSingleWidthType]::Percentage
+        [ADFMediaSingleWidthType] $WidthType = [ADFMediaSingleWidthType]::Percentage,
+        [string] $LocalId
     )
 
     $Node = [ADFMediaSingle]::new( $Layout, $Width, $WidthType )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -1714,6 +1752,7 @@ class ADFOrderedList : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'order', [int] )
     )
 
@@ -1733,6 +1772,8 @@ function New-ADFOrderedList {
         Creates an ADF ordered list node.
     .PARAMETER Content
         Scriptblock whose output ADFNode objects will be added as children of the ordered list node.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFOrderedList] )]
@@ -1741,10 +1782,12 @@ function New-ADFOrderedList {
         [Parameter( Position = 0 )]
         [scriptblock] $Content,
         [Alias( 'Start' )]
-        [int] $Order = 1
+        [int] $Order = 1,
+        [string] $LocalId
     )
     
     $Node = if ( $PSBoundParameters.ContainsKey('Order') ) { [ADFOrderedList]::new( $Order ) } else { [ADFOrderedList]::new() }
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -1777,6 +1820,7 @@ class ADFPanel : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'panelType', [ADFPanelType], [string], { $_.ToString().ToLower() } ) # required
     )
 
@@ -1796,6 +1840,8 @@ function New-ADFPanel {
         Scriptblock whose output ADFNode objects will be added as children of the panel node.
     .PARAMETER Type
         The type of panel, which determines the visual styling and semantics of the panel. Common types include 'info', 'note', 'tip', 'success', 'warning', and 'error'.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFPanel] )]
@@ -1804,10 +1850,12 @@ function New-ADFPanel {
         [Parameter( Position = 0 )]
         [scriptblock] $Content,
         [Parameter( Mandatory )]
-        [ADFPanelType] $Type
+        [ADFPanelType] $Type,
+        [string] $LocalId
     )
     
     $Node = [ADFPanel]::new( $Type )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -1821,11 +1869,16 @@ function New-ADFPanel {
 class ADFParagraph : ADFBlockNode {
 
     [string] $type = 'paragraph'
+    [hashtable] $attrs = @{}
     [System.Collections.Generic.List[ADFNode]] $content = @()
     [System.Collections.Generic.List[ADFMark]] $marks = @()
 
     hidden static [string[]] $AllowedChildren = @(
         'date', 'emoji', 'hardBreak', 'inlineCard', 'mention', 'status', 'text', 'mediaInline'
+    )
+
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
     )
 
     hidden static [string[]] $AllowedMarks = @(
@@ -1845,6 +1898,8 @@ function New-ADFParagraph {
         Creates an ADF paragraph node, which is a fundamental block-level element used to structure and format text content within the document.
     .PARAMETER Content
         Scriptblock whose output ADFNode objects will be added as children of the paragraph node. Typically, these will be ADFText nodes representing individual pieces of text within the paragraph, but can also include other inline elements such as ADFMention or ADFStatus.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFParagraph] )]
@@ -1854,10 +1909,12 @@ function New-ADFParagraph {
         [scriptblock] $Content,
         [ADFAlignment] $Align,
         [ValidateRange( 1, 6 )]
-        [int] $IndentationLevel
+        [int] $IndentationLevel,
+        [string] $LocalId
     )
     
     $Node = [ADFParagraph]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Align ) {
         $Node | Add-ADFAlignmentMark -Align $Align
     }
@@ -1877,8 +1934,13 @@ function New-ADFParagraph {
 class ADFRule : ADFBlockNode {
 
     [string] $type = 'rule'
+    [hashtable] $attrs = @{}
 
     ADFRule() : base() {}
+
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
+    )
 
 }
 
@@ -1888,13 +1950,19 @@ function New-ADFRule {
     <#
     .SYNOPSIS
         Creates an ADF rule node, which represents a thematic break or horizontal rule used to visually separate content within the document.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFRule] )]
     [Alias( 'ADFRule' )]
-    param()
+    param(
+        [string] $LocalId
+    )
     
-    return [ADFRule]::new()
+    $Node = [ADFRule]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
+    return $Node
 
 }
 
@@ -1932,6 +2000,7 @@ class ADFTable : ADFBlockNode {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'displayMode', [ADFTableDisplayMode], [string], { $_.ToString().ToLower() } )
         [ADFAttributeInfo]::new( 'layout', [ADFTableLayout], [string], { $_.ToString() -creplace '(?<=[a-z])(?=[A-Z])', '-' | ForEach-Object ToLower } )
         [ADFAttributeInfo]::new( 'width', [UInt32] )
@@ -1976,6 +2045,8 @@ function New-ADFTable {
         Creates an ADF table node, which is a block-level element used to organize and display tabular data within the document.
     .PARAMETER Content
         Scriptblock whose output ADFNode objects will be added as children of the table node. Typically, these will be ADFTableRow nodes representing individual rows within the table, which in turn contain ADFTableCell nodes for each cell within the row.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFTable] )]
@@ -1986,10 +2057,12 @@ function New-ADFTable {
         [ADFTableDisplayMode] $DisplayMode,
         [ADFTableLayout] $Layout,
         [UInt32] $Width,
-        [switch] $IsNumberColumnEnabled
+        [switch] $IsNumberColumnEnabled,
+        [string] $LocalId
     )
     
     $Node = [ADFTable]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $PSBoundParameters.ContainsKey('DisplayMode') ) { $Node.AddAttribute( 'displayMode', $DisplayMode ) }
     if ( $PSBoundParameters.ContainsKey('Layout') ) { $Node.AddAttribute( 'layout', $Layout ) }
     if ( $PSBoundParameters.ContainsKey('Width') ) { $Node.AddAttribute( 'width', $Width ) }
@@ -2002,6 +2075,120 @@ function New-ADFTable {
 }
 
 
+# MARK: ADFTaskItemState Enum
+# Enum to represent the allowed states for task item elements in the ADF structure.
+enum ADFTaskItemState {
+    TODO
+    DONE
+}
+
+
+# MARK: ADFTaskItem Class
+# Represents a task item element in the ADF structure, which can be a child of an ADFTaskList
+class ADFTaskItem : ADFBlockNode {
+
+    [string] $type = 'taskItem'
+    [hashtable] $attrs = @{}
+    [System.Collections.Generic.List[ADFNode]] $content = @()
+
+    hidden static [string[]] $AllowedChildren = @(
+        'date', 'emoji', 'hardBreak', 'inlineCard', 'mention', 'status', 'text'
+    )
+
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
+        [ADFAttributeInfo]::new( 'state', [ADFTaskItemState], [string], { $_.ToString().ToUpper() } )  # required
+    )
+    
+    ADFTaskItem( [ADFTaskItemState] $State ) : base() {
+        $this.AddAttribute( 'state', $State )
+    }
+
+}
+
+
+# MARK: ADFTaskItem Function
+function New-ADFTaskItem {
+    <#
+    .SYNOPSIS
+        Creates an ADF task item node, which represents an individual task within a task list, with a specific state indicating whether the task is completed or pending.
+    .PARAMETER Content
+        Scriptblock whose output ADFNode objects will be added as children of the task item node. Typically, these will be ADFText nodes representing the description of the task, but can also include other inline elements such as ADFMention or ADFStatus.
+    .PARAMETER State
+        The state of the task item, indicating whether it is completed (DONE) or pending (TODO).
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
+    #>
+    [CmdletBinding( PositionalBinding = $false )]
+    [OutputType( [ADFTaskItem] )]
+    [Alias( 'ADFTaskItem' )]
+    param(
+        [Parameter( Position = 0 )]
+        [scriptblock] $Content,
+        [Parameter( Mandatory )]
+        [ADFTaskItemState] $State,
+        [string] $LocalId
+    )
+    
+    $Node = [ADFTaskItem]::new( $State )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
+    if ( $Content ) {
+        & $Content | ForEach-Object { $Node.AddChild( $_ ) }
+    }
+    return $Node
+
+}
+
+
+# MARK: ADFTaskList Class
+# Represents a task list element in the ADF structure, which can contain multiple task items.
+class ADFTaskList : ADFBlockNode {
+
+    [string] $type = 'taskList'
+    [hashtable] $attrs = @{}
+    [System.Collections.Generic.List[ADFNode]] $content = @()
+
+    hidden static [string[]] $AllowedChildren = @(
+        'taskItem'
+    )
+
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
+    )
+
+    ADFTaskList() : base() {}
+
+}
+
+
+# MARK: ADFTaskList Function
+function New-ADFTaskList {
+    <#
+    .SYNOPSIS
+        Creates an ADF task list node, which is a block-level element used to group multiple task items together within the document.
+    .PARAMETER Content
+        Scriptblock whose output ADFNode objects will be added as children of the task list node. Typically, these will be ADFTaskItem nodes representing individual tasks within the list.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
+    #>
+    [CmdletBinding( PositionalBinding = $false )]
+    [OutputType( [ADFTaskList] )]
+    [Alias( 'ADFTaskList' )]
+    param(
+        [Parameter( Position = 0 )]
+        [scriptblock] $Content,
+        [string] $LocalId
+    )
+    
+    $Node = [ADFTaskList]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
+    if ( $Content ) {
+        & $Content | ForEach-Object { $Node.AddChild( $_ ) }
+    }
+    return $Node
+
+}
+
 # MARK: ## CHILD BLOCK NODES ##
 
 
@@ -2010,10 +2197,15 @@ function New-ADFTable {
 class ADFListItem : ADFBlockNode {
 
     [string] $type = 'listItem'
+    [hashtable] $attrs = @{}
     [System.Collections.Generic.List[ADFNode]] $content = @()
 
     hidden static [string[]] $AllowedChildren = @(
         'bulletList', 'codeBlock', 'mediaSingle', 'orderedList', 'paragraph'
+    )
+
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
     )
 
     ADFListItem() : base() {}
@@ -2028,16 +2220,20 @@ function New-ADFListItem {
         Creates an ADF list item node.
     .PARAMETER Content
         Scriptblock whose output ADFNode objects will be added as children of the list item node.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFListItem] )]
     [Alias( 'ADFListItem' )]
     param(
         [Parameter( Position = 0 )]
-        [scriptblock] $Content
+        [scriptblock] $Content,
+        [string] $LocalId
     )
     
     $Node = [ADFListItem]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -2063,6 +2259,7 @@ class ADFMedia : ADFBlockNode {
     [System.Collections.Generic.List[ADFMark]] $marks = @()
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'id', [string] )                                                 # required
         [ADFAttributeInfo]::new( 'type', [ADFMediaType], [string], { $_.ToString().ToLower() } )  # required
         [ADFAttributeInfo]::new( 'collection', [string] )                                         # required
@@ -2125,6 +2322,8 @@ function New-ADFMedia {
         Optional height of the media in pixels, required when the media is a single item (mediaSingle) to ensure proper rendering and layout.
     .PARAMETER OccurrenceKey
         Optional unique key for tracking occurrences of the media, useful for analytics or media management purposes, especially when handling deletions or updates to the media.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false, DefaultParameterSetName = 'Default' )]
     [OutputType( [ADFMedia] )]
@@ -2139,6 +2338,7 @@ function New-ADFMedia {
         [UInt32] $Width,
         [UInt32] $Height,
         [string] $OccurrenceKey,
+        [string] $LocalId,
         [Parameter( ParameterSetName = 'Link', Mandatory )]
         [uri] $LinkHref,
         [Parameter( ParameterSetName = 'Link' )]
@@ -2152,6 +2352,7 @@ function New-ADFMedia {
     )
 
     $Node = [ADFMedia]::new( $Id, $Type, $Collection )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $PSBoundParameters.ContainsKey('Width') ) { $Node.AddAttribute( 'width', $Width ) }
     if ( $PSBoundParameters.ContainsKey('Height') ) { $Node.AddAttribute( 'height', $Height ) }
     if ( $PSBoundParameters.ContainsKey('OccurrenceKey') ) { $Node.AddAttribute( 'occurrenceKey', $OccurrenceKey ) }
@@ -2170,7 +2371,7 @@ function New-ADFMedia {
 
 # MARK: ADFNestedExpand Class
 # Represents a nested expand element in the ADF structure, which can be a child of an expand element.
-class ADFNestedExpand : ADFExpand {
+class ADFNestedExpand : ADFBlockNode {
 
     [string] $type = 'nestedExpand'
     [hashtable] $attrs = @{}
@@ -2181,6 +2382,7 @@ class ADFNestedExpand : ADFExpand {
     )
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'title', [string] )
     )
 
@@ -2202,6 +2404,8 @@ function New-ADFNestedExpand {
         Scriptblock whose output ADFNode objects will be added as children of the nested expand node
     .PARAMETER Title
         The title of the nested expand node, displayed as the clickable text that expands or collapses the content of the nested expand. This allows for better organization and readability when dealing with complex or lengthy content that can be expanded or collapsed by the user.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFNestedExpand] )]
@@ -2209,10 +2413,12 @@ function New-ADFNestedExpand {
     param(
         [Parameter( Position = 0 )]
         [scriptblock] $Content,
-        [string] $Title
+        [string] $Title,
+        [string] $LocalId
     )
 
     $Node = if ( $PSBoundParameters.ContainsKey('Title') ) { [ADFNestedExpand]::new( $Title ) } else { [ADFNestedExpand]::new() }
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $Content ) {
         & $Content | ForEach-Object { $Node.AddChild( $_ ) }
     }
@@ -2401,6 +2607,7 @@ class ADFDate : ADFInlineNode {
     [hashtable] $attrs = @{}
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'timestamp', [DateTime], [Int64], { [System.DateTimeOffset]::new( $_ ).ToUnixTimeSeconds() } )
     )
 
@@ -2420,15 +2627,20 @@ function New-ADFDate {
         Creates an ADF date node.
     .PARAMETER Timestamp
         The date and time value to be represented by the date node.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFDate] )]
     [Alias( 'ADFDate' )]
     param(
-        [DateTime] $Timestamp
+        [DateTime] $Timestamp,
+        [string] $LocalId
     )
     
-    return [ADFDate]::new( $Timestamp )
+    $Node = [ADFDate]::new( $Timestamp )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
+    return $Node
 
 }
 
@@ -2441,6 +2653,7 @@ class ADFEmoji : ADFInlineNode {
     [hashtable] $attrs = @{}
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )     # optional, unique identifier
         [ADFAttributeInfo]::new( 'shortName', [string] )   # required
         [ADFAttributeInfo]::new( 'id', [string] )          # optional, service ID of the emoji
         [ADFAttributeInfo]::new( 'text', [string] )        # optional, fallback text to display if the emoji cannot be rendered, defaults to the shortName
@@ -2475,6 +2688,8 @@ function New-ADFEmoji {
         Optional text to display for the emoji, used as a fallback if the emoji cannot be rendered. Defaults to the short name if not provided.
     .PARAMETER Id
         Optional service ID of the emoji, used for tracking or referencing the emoji within the document.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFEmoji] )]
@@ -2483,18 +2698,21 @@ function New-ADFEmoji {
         [Parameter( Mandatory )]
         [string] $ShortName,
         [string] $Text,
-        [string] $Id
+        [string] $Id,
+        [string] $LocalId
     )
     
-    if ( $PSBoundParameters.ContainsKey('Id') -and $PSBoundParameters.ContainsKey('Text') ) {
-        return [ADFEmoji]::new( $ShortName, $Text, $Id )
+    $Node = if ( $PSBoundParameters.ContainsKey('Id') -and $PSBoundParameters.ContainsKey('Text') ) {
+        [ADFEmoji]::new( $ShortName, $Text, $Id )
     }
     elseif ( $PSBoundParameters.ContainsKey('Text') ) {
-        return [ADFEmoji]::new( $ShortName, $Text )
+        [ADFEmoji]::new( $ShortName, $Text )
     }
     else {
-        return [ADFEmoji]::new( $ShortName )
+        [ADFEmoji]::new( $ShortName )
     }
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
+    return $Node
 
 }
 
@@ -2504,10 +2722,13 @@ function New-ADFEmoji {
 class ADFHardBreak : ADFInlineNode {
 
     [string] $type = 'hardBreak'
+    [hashtable] $attrs = @{}
 
     # NOTE: Technically the hardBreak supports a text attribute, but it only allows the default value '\n'
     # NOTE: so it is not implemented here, as it is not useful for any practical purpose.
-    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @()
+    hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
+    )
 
     ADFHardBreak() : base() {}
 
@@ -2521,13 +2742,19 @@ function New-ADFHardBreak {
         Creates an ADF hard break node.
     .PARAMETER Text
         Optional text to display for the hard break, used as a fallback if the hard break cannot be rendered. Defaults to a newline character if not provided.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFHardBreak] )]
     [Alias( 'ADFHardBreak' )]
-    param()
+    param(
+        [string] $LocalId
+    )
 
-    return [ADFHardBreak]::new()
+    $Node = [ADFHardBreak]::new()
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
+    return $Node
 
 }
 
@@ -2540,6 +2767,7 @@ class ADFInlineCard : ADFInlineNode {
     [hashtable] $attrs = @{}
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'url', [uri], [string] )
         [ADFAttributeInfo]::new( 'data', [string], [object], { ConvertFrom-Json -InputObject $_ -Depth 5 -ErrorAction Stop } ) # JSONLD representation
     )
@@ -2564,6 +2792,8 @@ function New-ADFInlineCard {
         The URL that the inline card points to, making the card clickable and directing users to the specified URL when clicked.
     .PARAMETER Data
         JSONLD representation of the data to be displayed in the inline card, allowing for rich content and metadata to be included in the card.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false, DefaultParameterSetName = 'Url' )]
     [OutputType( [ADFInlineCard] )]
@@ -2572,10 +2802,12 @@ function New-ADFInlineCard {
         [Parameter( ParameterSetName = 'Url', Mandatory )]
         [uri] $Url,
         [Parameter( ParameterSetName = 'Data', Mandatory )]
-        [string] $Data
+        [string] $Data,
+        [string] $LocalId
     )
     
     $Node = if ( $PSBoundParameters.ContainsKey('Url') ) { [ADFInlineCard]::new( $Url ) } else { [ADFInlineCard]::new( $Data ) }
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     return $Node
 
 }
@@ -2608,6 +2840,7 @@ class ADFMention : ADFInlineNode {
     [hashtable] $attrs = @{}
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'id', [string] )                                                                 # required, unique identifier of the mentioned entity
         [ADFAttributeInfo]::new( 'text', [string] )                                                               # optional, text to display for the mention, defaults to the id
         [ADFAttributeInfo]::new( 'accessLevel', [ADFMentionAccessLevel], [string], { $_.ToString().ToUpper() } )  # optional, access level of the mentioned entity
@@ -2646,6 +2879,8 @@ function New-ADFMention {
         Optional access level of the mentioned entity, which can be used to control visibility or permissions related to the mention. Defaults to None if not provided.
     .PARAMETER UserType
         Optional user type of the mentioned entity, which can be used to categorize mentions based on user roles or types. Defaults to Default if not provided.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFMention] )]
@@ -2655,10 +2890,12 @@ function New-ADFMention {
         [string] $Id,
         [string] $Text,
         [ADFMentionAccessLevel] $AccessLevel,
-        [ADFMentionUserType] $UserType
+        [ADFMentionUserType] $UserType,
+        [string] $LocalId
     )
 
     $Node = [ADFMention]::new( $Id )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
     if ( $PSBoundParameters.ContainsKey('Text') ) { $Node.AddAttribute( 'text', $Text ) }
     if ( $PSBoundParameters.ContainsKey('AccessLevel') ) { $Node.AddAttribute( 'accessLevel', $AccessLevel ) }
     if ( $PSBoundParameters.ContainsKey('UserType') ) { $Node.AddAttribute( 'userType', $UserType ) }
@@ -2687,6 +2924,7 @@ class ADFStatus : ADFInlineNode {
     [hashtable] $attrs = @{}
 
     hidden static [ADFAttributeInfo[]] $AllowedAttributes = @(
+        [ADFAttributeInfo]::new( 'localId', [string] )  # optional, unique identifier
         [ADFAttributeInfo]::new( 'text', [string] )                                                               # required, text to display for the status
         [ADFAttributeInfo]::new( 'color', [ADFStatusColor], [string], { $_.ToString().ToLower() } )               # required, color of the status, defaults to Neutral
     )
@@ -2713,6 +2951,8 @@ function New-ADFStatus {
         The text to display for the status, which provides a description or label for the status being represented.
     .PARAMETER Color
         The color of the status, which can be used to visually differentiate between different statuses. Common color options include 'neutral', 'purple', 'blue', 'red', 'yellow', and 'green'.
+    .PARAMETER LocalId
+        Optional unique identifier for the node.
     #>
     [CmdletBinding( PositionalBinding = $false )]
     [OutputType( [ADFStatus] )]
@@ -2720,10 +2960,13 @@ function New-ADFStatus {
     param(
         [Parameter( Mandatory )]
         [string] $Text,
-        [ADFStatusColor] $Color = [ADFStatusColor]::Neutral
+        [ADFStatusColor] $Color = [ADFStatusColor]::Neutral,
+        [string] $LocalId
     )
     
-    return [ADFStatus]::new( $Text, $Color )
+    $Node = [ADFStatus]::new( $Text, $Color )
+    if ( $PSBoundParameters.ContainsKey('LocalId') ) { $Node.AddAttribute( 'localId', $LocalId ) }
+    return $Node
 
 }
 
