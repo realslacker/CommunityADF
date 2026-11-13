@@ -12,7 +12,7 @@
 RootModule = 'CommunityADF.psm1'
 
 # Version number of this module.
-ModuleVersion = '2026.10.8.1416'
+ModuleVersion = '2026.11.12.1028'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
