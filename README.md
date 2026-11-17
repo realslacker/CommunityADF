@@ -19,22 +19,22 @@ CommunityADF is a PowerShell DSL for building Atlassian Document Format (ADF) JS
 
 ## Installation
 
-From the repository root:
+You can install from the PowerShell Gallery:
 
 ```powershell
-Import-Module .\src\CommunityADF\CommunityADF.psd1 -Force
+Install-Module CommunityADF -Repository PSGallery
 ```
 
-If you want to load the module from elsewhere, use the module path directly:
+If you want to load the module from directly from the repository:
 
 ```powershell
-Import-Module "C:\path\to\CommunityADF\src\CommunityADF\CommunityADF.psd1" -Force
+Import-Module '.\src\CommunityADF\CommunityADF.psd1'
 ```
 
 ## Quick start
 
 ```powershell
-Import-Module .\src\CommunityADF\CommunityADF.psd1 -Force
+Import-Module CommunityADF
 
 ADFDoc {
     ADFParagraph {
@@ -63,6 +63,8 @@ This produces ADF JSON similar to:
   ]
 }
 ```
+
+The resulting JSON can be used with any API endpoint that accepts Atlassian Document Format.
 
 ## Common patterns
 
